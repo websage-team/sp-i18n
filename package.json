@@ -1,0 +1,21 @@
+{
+  "name": "sp-i18n",
+  "version": "1.0.0",
+  "description": "i18n functions & utilities for Super Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/websage-team/sp-i18n"
+  },
+  "author": "diablohudream@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/websage-team/sp-i18n/issues"
+  },
+  "homepage": "https://github.com/websage-team/sp-i18n",
+  "dependencies": {
+  }
+}
