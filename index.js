@@ -1,8 +1,8 @@
 export const I18N_INIT = 'I18N_INIT'
 
 // 当前项目可用的语言包代码，与语言包文件名精确匹配
-// 注：无论何种环境，在使用任何函数前，需要使用 registerAvailableLocales() 函数定义/初始化该 Array
-export let availableLocales = []
+// 注：无论何种环境，在使用任何函数前，需要使用 register() 函数定义/初始化该 Array
+let availableLocales = []
 
 // 当前语言包名代码，与语言包文件名精确匹配
 export let localeId = null
@@ -10,14 +10,25 @@ export let localeId = null
 // 存储文本，按语言包名，如 locales.en、locales['zh-cn']
 export let locales = {}
 
+// 语言包文件存放目录
+export let pathLocales = './'
+
 
 /**
  * 初始化 availableLocales
  * 
  * @param {array} locales 项目可用的语言包代码
  */
-export const registerAvailableLocales = (locales = []) => {
+export const register = (locales = [], dir = './') => {
+    if (availableLocales.length) return
+
     availableLocales = locales
+    pathLocales = dir
+
+    // const path = require('path')
+    availableLocales.forEach(locale => {
+        // locales[localeId] = require(path.resolve(pathLocales, locale + '.json'))
+    })
 }
 
 
@@ -114,25 +125,32 @@ export const getLocaleId = (input) => {
  * 
  * @returns (如果已初始化)locales[localeId] | (服务器环境) 无 | (客户端环境) Promise
  */
-export const init = (langList = []) => {
+export const init = (langList = [], pathLocales = '') => {
     // console.log(locales[localeId])
-    if (typeof langList === 'string' && langList.indexOf(';') > -1)
-        langList = parseLanguageList(langList)
+    if (typeof langList === 'string')
+        if (langList.indexOf(';') > -1)
+            langList = parseLanguageList(langList)
+        else
+            return init([langList])
 
     localeId = localeId || getLocaleId(langList)
 
     if (locales[localeId]) return locales[localeId]
 
-    if (__SERVER__ || typeof window === 'undefined') {
-        locales[localeId] = require(`../locales/${localeId}.json`)
-    }
-    if (__CLIENT__) {
-        return System.import(`../locales/${localeId}.json`).then((data) => {
-            locales[localeId] = data
+    // if (__SERVER__ || typeof window === 'undefined') {
+    // const path = require('path')
+    // const filename = path.resolve(pathLocales, localeId + '.json')
+    // console.log(filename, typeof filename, process.cwd())
+    // locales[localeId] = require(file)
+    // locales[localeId] = require(filename)
+    // }
+    // if (__CLIENT__) {
+    //     return System.import(`${pathLocales}/${localeId}.json`).then((data) => {
+    //         locales[localeId] = data
 
-            return data
-        })
-    }
+    //         return data
+    //     })
+    // }
 }
 
 
@@ -205,10 +223,18 @@ export const reducer = (state = null, action) => {
  * 
  * @param {state} state 当前 Redux state
  */
-export const dispatchInitFromState = (state) => {
+export const dispatchInitFromState = (state, dispatch) => {
     localeId = null
 
-    init(parseLanguageList(getLanglistFromState(state)))
+    init(parseLanguageList(
+        (typeof state === 'object') ? getLanglistFromState(state) : state
+    ))
+
+    if (dispatch)
+        return dispatch({
+            type: I18N_INIT,
+            localeId: '' + localeId
+        })
 
     return (dispatch) => {
         dispatch({
