@@ -1,4 +1,5 @@
-export const I18N_INIT = 'I18N_INIT'
+const I18N_INIT = 'I18N_INIT'
+const I18N_LOCALES = 'I18N_LOCALES'
 
 // 当前项目可用的语言包代码，与语言包文件名精确匹配
 // 注：无论何种环境，在使用任何函数前，需要使用 register() 函数定义/初始化该 Array
@@ -10,25 +11,24 @@ export let localeId = null
 // 存储文本，按语言包名，如 locales.en、locales['zh-cn']
 export let locales = {}
 
-// 语言包文件存放目录
-export let pathLocales = './'
-
 
 /**
- * 初始化 availableLocales
+ * 初始化
  * 
- * @param {array} locales 项目可用的语言包代码
+ * @param {array|object} args[0] (服务器环境)项目可用的语言包代码；(客户端环境)redux state
+ * @param {object} args[1] (服务器环境)locales 处理后的值
  */
-export const register = (locales = [], dir = './') => {
-    if (availableLocales.length) return
+export const register = (...args) => {
+    if (__SERVER__) {
+        if (availableLocales.length) return
 
-    availableLocales = locales
-    pathLocales = dir
-
-    // const path = require('path')
-    availableLocales.forEach(locale => {
-        // locales[localeId] = require(path.resolve(pathLocales, locale + '.json'))
-    })
+        availableLocales = args[0]
+        locales = args[1]
+    }
+    if (__CLIENT__) {
+        localeId = args[0].localeId
+        locales[localeId] = args[0].locales
+    }
 }
 
 
@@ -41,7 +41,7 @@ export const register = (locales = [], dir = './') => {
  * 
  * @returns 匹配的语言包ID localeId 或 availableLocales[0]
  */
-export const getLocaleId = (input) => {
+const getLocaleId = (input) => {
     /**
      * 检查单项，如果和availableLocales内的项目有匹配，返回匹配，否则返回null
      * @param {string} input 检查项
@@ -115,42 +115,25 @@ export const getLocaleId = (input) => {
 
 
 /**
- * 根据语言列表，初始化i18n，包括
- *    获得并赋值 localeId
- *    如果为服务器环境(__SERVER__)，加载对应的语言包文件
- *    如果为客户端环境(__CLIENT__)，异步加载对应的语言包文件，并返回异步 Promise
- *    语言包加载完成后，将结果放入 locales[localeId]
+ * 服务器环境：根据语言列表，初始化i18n，获得并赋值 localeId
  * 
- * @param {array} langList 语言列表
+ * @param {array|string} langList 语言列表
  * 
- * @returns (如果已初始化)locales[localeId] | (服务器环境) 无 | (客户端环境) Promise
+ * @returns (如果已初始化)locales[localeId]
  */
-export const init = (langList = [], pathLocales = '') => {
-    // console.log(locales[localeId])
-    if (typeof langList === 'string')
-        if (langList.indexOf(';') > -1)
-            langList = parseLanguageList(langList)
-        else
-            return init([langList])
+const init = (langList = []) => {
+    if (__SERVER__) {
+        // console.log(locales[localeId])
+        if (typeof langList === 'string')
+            if (langList.indexOf(';') > -1)
+                langList = parseLanguageList(langList)
+            else
+                return init([langList])
 
-    localeId = localeId || getLocaleId(langList)
+        localeId = localeId || getLocaleId(langList)
 
-    if (locales[localeId]) return locales[localeId]
-
-    // if (__SERVER__ || typeof window === 'undefined') {
-    // const path = require('path')
-    // const filename = path.resolve(pathLocales, localeId + '.json')
-    // console.log(filename, typeof filename, process.cwd())
-    // locales[localeId] = require(file)
-    // locales[localeId] = require(filename)
-    // }
-    // if (__CLIENT__) {
-    //     return System.import(`${pathLocales}/${localeId}.json`).then((data) => {
-    //         locales[localeId] = data
-
-    //         return data
-    //     })
-    // }
+        if (locales[localeId]) return locales[localeId]
+    }
 }
 
 
@@ -202,14 +185,14 @@ export const getLanglistFromState = (state) => {
 
 
 /**
- * Redux reducer
+ * Redux reducer: 初始化 localeId
  * 
  * @param {*} state 
  * @param {*} action
  * 
  * @returns {*} state
  */
-export const reducer = (state = null, action) => {
+export const reducerLocaleId = (state = null, action) => {
     switch (action.type) {
         case I18N_INIT:
             return action.localeId
@@ -219,28 +202,40 @@ export const reducer = (state = null, action) => {
 
 
 /**
- * 根据当前 Redux state 派发(dispatch)初始化 i18n
+ * Redux reducer: 初始化 locales
  * 
- * @param {state} state 当前 Redux state
+ * @param {*} state 
+ * @param {*} action
+ * 
+ * @returns {*} state
  */
-export const dispatchInitFromState = (state, dispatch) => {
+export const reducerLocales = (state = {}, action) => {
+    switch (action.type) {
+        case I18N_LOCALES:
+            return Object.assign({}, state, action.locales)
+    }
+    return state
+}
+
+
+export const actionInit = (state) => {
     localeId = null
 
     init(parseLanguageList(
         (typeof state === 'object') ? getLanglistFromState(state) : state
     ))
 
-    if (dispatch)
-        return dispatch({
-            type: I18N_INIT,
-            localeId: '' + localeId
-        })
+    return {
+        type: I18N_INIT,
+        localeId: '' + localeId
+    }
+}
 
-    return (dispatch) => {
-        dispatch({
-            type: I18N_INIT,
-            localeId: '' + localeId
-        })
+
+export const actionLocales = () => {
+    return {
+        type: I18N_LOCALES,
+        locales: locales[localeId]
     }
 }
 
