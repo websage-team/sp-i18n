@@ -41,7 +41,7 @@ export const register = (...args) => {
  * 
  * @returns 匹配的语言包ID localeId 或 availableLocales[0]
  */
-const getLocaleId = (input) => {
+export const getLocaleId = (input) => {
     /**
      * 检查单项，如果和availableLocales内的项目有匹配，返回匹配，否则返回null
      * @param {string} input 检查项
