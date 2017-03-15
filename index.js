@@ -262,9 +262,13 @@ const translate = (key, obj = {}) => {
 
     if (!str) str = key
 
-    return str.replace(/\$\{([^\}]+)\}/g, (match, p) => {
-        return obj[p] || p
-    })
+    if (typeof str === 'string')
+        return str.replace(/\$\{([^\}]+)\}/g, (match, p) => {
+            return obj[p] || p
+        })
+
+    else
+        return str
 }
 
 
