@@ -251,7 +251,16 @@ export const actionLocales = () => {
  */
 const translate = (key, obj = {}) => {
     // const localeId = _self.curLocaleId
-    let str = (locales[localeId] && locales[localeId][key]) ? locales[localeId][key] : key
+    const l = locales[localeId]
+    let str = (l && l[key]) ? l[key] : null
+
+    if (!str) {
+        try {
+            str = eval('l.' + key)
+        } catch (e) { }
+    }
+
+    if (!str) str = key
 
     return str.replace(/\$\{([^\}]+)\}/g, (match, p) => {
         return obj[p] || p
