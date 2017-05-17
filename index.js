@@ -33,6 +33,27 @@ export const register = (...args) => {
 
 
 /**
+ * 初始化 (非同构项目)
+ * 
+ * @param {array|object} arg 可用语言列表(Array) | 语言包内容(object)
+ */
+export const registerNonIsomorphic = (arg) => {
+    if (Array.isArray(arg)) {
+        availableLocales = arg
+        localeId = getLocaleId()
+
+        return {
+            type: I18N_INIT,
+            localeId: '' + localeId
+        }
+    } else if (typeof arg === 'object') {
+        locales[localeId] = arg
+        return actionLocales()
+    }
+}
+
+
+/**
  * 根据输入内容返回availableLocales内匹配的语言包ID(localeId)
  * 如果没有匹配，返回availableLocales的第一项
  * 注：仅为返回，没有赋值操作
