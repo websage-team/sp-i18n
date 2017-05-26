@@ -284,9 +284,10 @@ const translate = (key, obj = {}) => {
     if (!str) str = key
 
     if (typeof str === 'string')
-        return str.replace(/\$\{([^\}]+)\}/g, (match, p) => {
-            return obj[p] || p
-        })
+        return str.replace(
+            /\$\{([^\}]+)\}/g,
+            (match, p) => typeof obj[p] === 'undefined' ? p : obj[p]
+        )
 
     else
         return str
