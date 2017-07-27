@@ -28,7 +28,7 @@ export const register = (...args) => {
     if (__CLIENT__) {
         localeId = args[0].localeId
         locales[localeId] = args[0].locales
-        if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
+        if (localeId && typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
             const Cookies = require('js-cookie')
             Cookies.set('spLocaleId', localeId, { expires: 365 })
         }
