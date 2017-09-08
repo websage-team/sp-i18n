@@ -277,15 +277,15 @@ export const actionLocales = () => {
 const translate = (key, obj = {}) => {
     // const localeId = _self.curLocaleId
     const l = locales[localeId]
-    let str = (l && l[key]) ? l[key] : null
+    let str = (l && typeof l[key] !== 'undefined') ? l[key] : undefined
 
-    if (!str) {
+    if (typeof str === 'undefined') {
         try {
             str = eval('l.' + key)
         } catch (e) { }
     }
 
-    if (!str) str = key
+    if (typeof str === 'undefined') str = key
 
     if (typeof str === 'string')
         return str.replace(
