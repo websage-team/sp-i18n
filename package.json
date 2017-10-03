@@ -21,6 +21,6 @@
     "js-cookie": "^2.1.4"
   },
   "peerDependencies": {
-    "super-project": "1.x"
+    "super-project": ">=2"
   }
 }
