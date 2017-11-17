@@ -1,6 +1,6 @@
 {
   "name": "sp-i18n",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "i18n functions & utilities for Super Project",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/websage-team/sp-i18n",
   "dependencies": {
-    "cookie": "^0.3.1",
     "js-cookie": "^2.1.4"
   },
   "peerDependencies": {
