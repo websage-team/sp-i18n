@@ -1,141 +1,22 @@
-const I18N_INIT = 'I18N_INIT'
-const I18N_LOCALES = 'I18N_LOCALES'
+import getLocaleId from './get-locale-id'
+import parseLanguageList from './parse-language-list'
+
+export const I18N_INIT = 'I18N_INIT'
+export const I18N_LOCALES = 'I18N_LOCALES'
 
 // 当前项目可用的语言包代码，与语言包文件名精确匹配
 // 注：无论何种环境，在使用任何函数前，需要使用 register() 函数定义/初始化该 Array
-let availableLocales = []
+export let availableLocales = []
+export const setAvailableLocales = arr => availableLocales = arr
 
 // 当前语言包名代码，与语言包文件名精确匹配
 export let localeId = null
+export const setLocaleId = locale => localeId = locale
 
 // 存储文本，按语言包名，如 locales.en、locales['zh-cn']
 export let locales = {}
-
-
-/**
- * 初始化
- * 
- * @param {array|object} args[0] (服务器环境)项目可用的语言包代码；(客户端环境)redux state
- * @param {object} args[1] (服务器环境)locales 处理后的值
- */
-export const register = (...args) => {
-    if (__SERVER__) {
-        if (availableLocales.length) return
-
-        availableLocales = args[0]
-        locales = args[1]
-    }
-    if (__CLIENT__) {
-        localeId = args[0].localeId
-        locales[localeId] = args[0].locales
-        if (localeId && typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
-            const Cookies = require('js-cookie')
-            Cookies.set('spLocaleId', localeId, { expires: 365 })
-        }
-    }
-}
-
-
-/**
- * 初始化 (非同构项目)
- * 
- * @param {array|object} arg 可用语言列表(Array) | 语言包内容(object)
- */
-export const registerNonIsomorphic = (arg) => {
-    if (Array.isArray(arg)) {
-        availableLocales = arg
-        localeId = getLocaleId()
-
-        return {
-            type: I18N_INIT,
-            localeId: '' + localeId
-        }
-    } else if (typeof arg === 'object') {
-        locales[localeId] = arg
-        return actionLocales()
-    }
-}
-
-
-/**
- * 根据输入内容返回availableLocales内匹配的语言包ID(localeId)
- * 如果没有匹配，返回availableLocales的第一项
- * 注：仅为返回，没有赋值操作
- * 
- * @param {string, array} input 
- * 
- * @returns 匹配的语言包ID localeId 或 availableLocales[0]
- */
-export const getLocaleId = (input) => {
-    /**
-     * 检查单项，如果和availableLocales内的项目有匹配，返回匹配，否则返回null
-     * @param {string} input 检查项
-     * @returns 匹配的 localeId 或 null
-     */
-    const checkItem = (input) => {
-        let id
-
-        input = input.toLowerCase().replace(/\_/g, '-')
-
-        availableLocales.some(_localeId => {
-            if (_localeId == input)
-                id = _localeId
-            return id
-        })
-
-        const parseSeg = (id, localeId, str) => {
-            if (id) return id
-
-            const seg = localeId.split(str)
-
-            if (!id) {
-                availableLocales.some(_localeId => {
-                    if (_localeId == seg[0] + '-' + seg[seg.length - 1])
-                        id = _localeId
-                    return id
-                })
-            }
-
-            if (!id) {
-                availableLocales.some(_localeId => {
-                    if (_localeId == seg[0])
-                        id = _localeId
-                    return id
-                })
-            }
-
-            return id || null
-        }
-
-        id = parseSeg(id, input, '-')
-
-        return id || null
-    }
-
-    // 检查是否包含分号，如果是，按语言列表处理为array
-    // eg: zh-CN,zh;q=0.8,en;q=0.6
-    if (typeof input === 'string' && input.indexOf(';') > -1)
-        input = parseLanguageList(input)
-
-    // 检查是否为array
-    if (Array.isArray(input)) {
-        let id
-
-        input.some(thisId => {
-            id = checkItem(thisId)
-            return id
-        })
-
-        return id || availableLocales[0]
-    }
-
-    else if (!input && typeof navigator !== 'undefined')
-        return getLocaleId(navigator.languages || navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage || availableLocales[0])
-
-    else if (input)
-        return checkItem(input) || availableLocales[0]
-
-    return availableLocales[0]
+export const setLocales = (locale = localeId, obj) => {
+    locales[locale] = obj
 }
 
 
@@ -171,22 +52,6 @@ const init = (langList = []) => {
  */
 export const checkLocalesReady = (theLocaleId = localeId) => {
     return (typeof locales[theLocaleId] !== 'undefined')
-}
-
-
-/**
- * 根据输入的语言列表字符串，返回语言列表array
- * 
- * @param {string} langList 语言列表字符串，eg: zh-CN,zh;q=0.8,en;q=0.6
- * 
- * @returns {array} 语言列表
- */
-export const parseLanguageList = (langList) => {
-    langList = langList.split(',').map(thisLang => {
-        return thisLang.split(';')[0]
-    })
-
-    return langList
 }
 
 
