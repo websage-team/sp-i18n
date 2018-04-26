@@ -1,12 +1,11 @@
 import {
     actionInit,
     actionLocales
-} from 'sp-i18n'
+} from '../redux'
 
-export default (obj) => {
-    let { reduxStore } = obj
-    
+export default ({
+    reduxStore
+}) => {
     reduxStore.dispatch(actionInit(reduxStore.getState()))
     reduxStore.dispatch(actionLocales())
-
 }

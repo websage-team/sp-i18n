@@ -12,7 +12,7 @@ import {
 const checkItem = (input) => {
     let id
 
-    input = input.toLowerCase().replace(/\_/g, '-')
+    input = input.toLowerCase().replace(/_/g, '-')
 
     availableLocales.some(_localeId => {
         if (_localeId == input)
@@ -58,7 +58,7 @@ const checkItem = (input) => {
  * 
  * @returns 匹配的语言包ID localeId 或 availableLocales[0]
  */
-export default (input) => {
+const parseLocaleId = (input) => {
 
     // 检查是否包含分号，如果是，按语言列表处理为array
     // eg: zh-CN,zh;q=0.8,en;q=0.6
@@ -78,10 +78,12 @@ export default (input) => {
     }
 
     else if (!input && typeof navigator !== 'undefined')
-        return getLocaleId(navigator.languages || navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage || availableLocales[0])
+        return parseLocaleId(navigator.languages || navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage || availableLocales[0])
 
     else if (input)
         return checkItem(input) || availableLocales[0]
 
     return availableLocales[0]
 }
+
+export default parseLocaleId

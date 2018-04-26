@@ -1,6 +1,3 @@
-import getLocaleId from './get-locale-id'
-import parseLanguageList from './parse-language-list'
-
 export const I18N_INIT = 'I18N_INIT'
 export const I18N_LOCALES = 'I18N_LOCALES'
 
@@ -20,27 +17,6 @@ export const setLocales = (locale = localeId, obj) => {
 }
 
 
-/**
- * 服务器环境：根据语言列表，初始化i18n，获得并赋值 localeId
- * 
- * @param {array|string} langList 语言列表
- * 
- * @returns (如果已初始化)locales[localeId]
- */
-const init = (langList = []) => {
-    if (__SERVER__) {
-        // console.log(locales[localeId])
-        if (typeof langList === 'string')
-            if (langList.indexOf(';') > -1)
-                langList = parseLanguageList(langList)
-            else
-                return init([langList])
-
-        localeId = localeId || getLocaleId(langList)
-
-        if (locales[localeId]) return locales[localeId]
-    }
-}
 
 
 /**
@@ -54,80 +30,6 @@ export const checkLocalesReady = (theLocaleId = localeId) => {
     return (typeof locales[theLocaleId] !== 'undefined')
 }
 
-
-/**
- * 从当前的 Redux state 中获取语言列表字符串
- * 如果 uri search 中存在 fb_locale，将该值放在第一位
- * 
- * @param {object} state 当前的 Redux state
- * 
- * @returns {string} 语言列表，使用分号(;)分割
- */
-export const getLanglistFromState = (state) => {
-    const serverState = state.server || {}
-    const fb_locale = state.routing && state.routing.locationBeforeTransitions && state.routing.locationBeforeTransitions.query ? state.routing.locationBeforeTransitions.query.fb_locale : null
-
-    let lang = serverState.lang
-    if (fb_locale) lang = fb_locale + ';' + lang
-
-    return lang || ''
-}
-
-
-/**
- * Redux reducer: 初始化 localeId
- * 
- * @param {*} state 
- * @param {*} action
- * 
- * @returns {*} state
- */
-export const reducerLocaleId = (state = null, action) => {
-    switch (action.type) {
-        case I18N_INIT:
-            return action.localeId
-    }
-    return state
-}
-
-
-/**
- * Redux reducer: 初始化 locales
- * 
- * @param {*} state 
- * @param {*} action
- * 
- * @returns {*} state
- */
-export const reducerLocales = (state = {}, action) => {
-    switch (action.type) {
-        case I18N_LOCALES:
-            return Object.assign({}, state, action.locales)
-    }
-    return state
-}
-
-
-export const actionInit = (state) => {
-    localeId = null
-
-    init(parseLanguageList(
-        (typeof state === 'object') ? getLanglistFromState(state) : state
-    ))
-
-    return {
-        type: I18N_INIT,
-        localeId: '' + localeId
-    }
-}
-
-
-export const actionLocales = () => {
-    return {
-        type: I18N_LOCALES,
-        locales: locales[localeId]
-    }
-}
 
 
 /**
@@ -154,7 +56,7 @@ const translate = (key, obj = {}) => {
 
     if (typeof str === 'string')
         return str.replace(
-            /\$\{([^\}]+)\}/g,
+            /\$\{([^}]+)\}/g,
             (match, p) => typeof obj[p] === 'undefined' ? p : obj[p]
         )
 

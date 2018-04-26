@@ -4,9 +4,11 @@ import {
     localeId,
     setLocaleId,
     setLocales,
-    getLocaleId,
-    actionLocales,
+    parseLocaleId,
 } from '../index'
+import {
+    actionLocales,
+} from '../redux'
 
 
 /**
@@ -17,7 +19,7 @@ import {
 export default (arg) => {
     if (Array.isArray(arg)) {
         setAvailableLocales(arg)
-        setLocaleId(getLocaleId())
+        setLocaleId(parseLocaleId())
 
         return {
             type: I18N_INIT,
