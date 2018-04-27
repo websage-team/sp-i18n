@@ -1,6 +1,6 @@
 import parseLanguageList from '../parse-language-list'
 import getLanguagelistFromState from '../get-language-list-from-state'
-import parseLocaleId from '../get-locale-id'
+import parseLocaleId from '../parse-locale-id'
 
 import {
     I18N_INIT, I18N_LOCALES,
