@@ -88,7 +88,7 @@ const init = (langList = []) => {
             else
                 return init([langList])
 
-        localeId = localeId || parseLocaleId(langList)
+        setLocaleId(localeId || parseLocaleId(langList))
 
         if (locales[localeId]) return locales[localeId]
     }
