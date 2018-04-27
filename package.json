@@ -1,6 +1,6 @@
 {
   "name": "super-i18n",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "description": "i18n functions & utilities for Super Project",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/websage-team/super-i18n",
   "dependencies": {
-    "js-cookie": "^2.2.0"
+    "js-cookie": "^2.2.0",
+    "chalk": "^2.4.1"
   },
   "peerDependencies": {
     "super-project": ">=3"
