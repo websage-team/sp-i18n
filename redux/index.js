@@ -48,7 +48,7 @@ export const reducerLocales = (state = {}, action) => {
  * @returns {Object}
  */
 export const actionInit = (state) => {
-    setLocaleId(localeId)
+    // setLocaleId(localeId)
 
     init(parseLanguageList(
         (typeof state === 'object') ? getLanguagelistFromState(state) : state
@@ -88,7 +88,9 @@ const init = (langList = []) => {
             else
                 return init([langList])
 
-        setLocaleId(localeId || parseLocaleId(langList))
+        const parsed = parseLocaleId(langList)
+        if (parsed) setLocaleId(parsed)
+        // else setLocaleId(localeId)
 
         if (locales[localeId]) return locales[localeId]
     }

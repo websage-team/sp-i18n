@@ -8,7 +8,14 @@ export const setAvailableLocales = arr => availableLocales = arr
 
 // 当前语言包名代码，与语言包文件名精确匹配
 export let localeId = null
-export const setLocaleId = locale => localeId = locale
+export const setLocaleId = newLlocalId => {
+    if (typeof newLlocalId === 'undefined' || newLlocalId === null)
+        return
+    if (__DEV__)
+        console.log(`\n\x1b[33m[super-i18n]\x1b[0m setLocaleId -> \x1b[32m${newLlocalId}\x1b[0m\n`)
+    localeId = newLlocalId
+    return localeId
+}
 
 // 存储文本，按语言包名，如 locales.en、locales['zh-cn']
 export let locales = {}
