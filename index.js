@@ -11,10 +11,8 @@ export let localeId = null
 export const setLocaleId = newLlocalId => {
     if (typeof newLlocalId === 'undefined' || newLlocalId === null)
         return
-    if (__DEV__ && __SERVER__) {
-        const chalk = require('chalk')
-        console.log(`${chalk.yellowBright('[super/i18n]')} setLocaleId -> ${chalk.green(newLlocalId)}`)
-    }
+    if (__DEV__ && __SERVER__)
+        console.log(`\n\x1b[93m[super/i18n]\x1b[0m setLocaleId -> \x1b[32m${newLlocalId}\x1b[0m\n`)
     localeId = newLlocalId
     return localeId
 }
