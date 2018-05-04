@@ -55,7 +55,6 @@ const translate = (...args) => {
     let str
     let options = {}
     let length = args.length
-
     if (typeof args[args.length - 1] === 'object') {
         length -= 1
         options = args[args.length - 1]
@@ -63,15 +62,11 @@ const translate = (...args) => {
 
     if (typeof args[0] === 'object') {
         key = args[0]
-        console.log('============')
-        console.log(args)
         for (let i = 1; i < length; i++) {
             if (typeof key[args[i]] !== 'undefined')
                 key = key[args[i]]
-            console.log(i, key)
         }
         if (typeof key === 'object') key = args[length - 1]
-        console.log('============')
     } else {
         for (let i = 0; i < length; i++) {
             key += args[i]
