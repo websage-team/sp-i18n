@@ -1,3 +1,5 @@
+import React from 'react'
+
 export const I18N_INIT = 'I18N_INIT'
 export const I18N_LOCALES = 'I18N_LOCALES'
 
@@ -48,10 +50,44 @@ export const checkLocalesReady = (theLocaleId = localeId) => {
  * 
  * @returns {string} 翻译的文本；如果语言包中没有对应的项，返回 key
  */
-const translate = (key, obj = {}) => {
+const translate = (...args) => {
+    let key = ''
+    let str
+    let options = {}
+    let length = args.length
+
+    if (typeof args[args.length - 1] === 'object') {
+        length -= 1
+        options = args[args.length - 1]
+    }
+
+    if (typeof args[0] === 'object') {
+        key = args[0]
+        console.log('============')
+        console.log(args)
+        for (let i = 1; i < length; i++) {
+            if (typeof key[args[i]] !== 'undefined')
+                key = key[args[i]]
+            console.log(i, key)
+        }
+        if (typeof key === 'object') key = args[length - 1]
+        console.log('============')
+    } else {
+        for (let i = 0; i < length; i++) {
+            key += args[i]
+        }
+    }
+
+    // console.log(args, length, key)
+
+    if (__CLIENT__) {
+        str = key
+    }
+    if (__SERVER__) {
+        const l = locales[localeId]
+        str = (l && typeof l[key] !== 'undefined') ? l[key] : undefined
+    }
     // const localeId = _self.curLocaleId
-    const l = locales[localeId]
-    let str = (l && typeof l[key] !== 'undefined') ? l[key] : undefined
 
     if (typeof str === 'undefined') {
         try {
@@ -64,12 +100,29 @@ const translate = (key, obj = {}) => {
     if (typeof str === 'string')
         return str.replace(
             /\$\{([^}]+)\}/g,
-            (match, p) => typeof obj[p] === 'undefined' ? p : obj[p]
+            (match, p) => typeof options[p] === 'undefined' ? p : options[p]
         )
 
     else
         return str
 }
+
+// export const decorator = () => (Wrapped) => {
+//     // const L = {
+//     //     A: {
+//     //         B: '啊啊啊-啊啊啊'
+//     //     }
+//     // }
+//     // return Wrapped
+//     if (__CLIENT__) return Wrapped
+//     return (props) => (
+//         <Wrapped
+//             L={L}
+//             locales={locales[localeId]}
+//             {...props}
+//         />
+//     )
+// }
 
 
 export default translate
