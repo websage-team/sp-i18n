@@ -61,6 +61,7 @@ const translate = (...args) => {
     let str
     let options = {}
     const keys = []
+    const l = type === 'redux' || __SERVER__ ? locales[localeId] : undefined
 
     args.forEach((value, index) => {
         if (index == args.length - 1 && typeof value === 'object') {
@@ -91,11 +92,9 @@ const translate = (...args) => {
 
     // console.log(keys, length, key)
 
-    if (__CLIENT__) {
+    if (typeof l === 'undefined') {
         str = key
-    }
-    if (__SERVER__) {
-        const l = locales[localeId]
+    } else {
         str = (l && typeof l[key] !== 'undefined') ? l[key] : undefined
     }
     // const localeId = _self.curLocaleId
@@ -113,27 +112,8 @@ const translate = (...args) => {
             /\$\{([^}]+)\}/g,
             (match, p) => typeof options[p] === 'undefined' ? p : options[p]
         )
-
     else
         return str
 }
-
-// export const decorator = () => (Wrapped) => {
-//     // const L = {
-//     //     A: {
-//     //         B: '啊啊啊-啊啊啊'
-//     //     }
-//     // }
-//     // return Wrapped
-//     if (__CLIENT__) return Wrapped
-//     return (props) => (
-//         <Wrapped
-//             L={L}
-//             locales={locales[localeId]}
-//             {...props}
-//         />
-//     )
-// }
-
 
 export default translate
