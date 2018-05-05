@@ -54,26 +54,36 @@ const translate = (...args) => {
     let key = ''
     let str
     let options = {}
-    let length = args.length
-    if (typeof args[args.length - 1] === 'object') {
-        length -= 1
-        options = args[args.length - 1]
-    }
+    const keys = []
 
-    if (typeof args[0] === 'object') {
-        key = args[0]
-        for (let i = 1; i < length; i++) {
-            if (typeof key[args[i]] !== 'undefined')
-                key = key[args[i]]
+    args.forEach((value, index) => {
+        if (index == args.length - 1 && typeof value === 'object') {
+            options = value
+            return
         }
-        if (typeof key === 'object') key = args[length - 1]
+        if (typeof value === 'string' && value.includes('.')) {
+            value.split('.').forEach(value => keys.push(value))
+            return
+        }
+        keys.push(value)
+    })
+
+    const length = keys.length
+
+    if (typeof keys[0] === 'object') {
+        key = keys[0]
+        for (let i = 1; i < length; i++) {
+            if (typeof key[keys[i]] !== 'undefined')
+                key = key[keys[i]]
+        }
+        if (typeof key === 'object') key = keys[length - 1]
     } else {
         for (let i = 0; i < length; i++) {
-            key += args[i]
+            key += (i ? '.' : '') + keys[i]
         }
     }
 
-    // console.log(args, length, key)
+    // console.log(keys, length, key)
 
     if (__CLIENT__) {
         str = key

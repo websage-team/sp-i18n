@@ -7,5 +7,5 @@ export default ({
     reduxStore
 }) => {
     reduxStore.dispatch(actionInit(reduxStore.getState()))
-    reduxStore.dispatch(actionLocales())
+    // reduxStore.dispatch(actionLocales())
 }
