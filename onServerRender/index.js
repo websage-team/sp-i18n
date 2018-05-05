@@ -2,10 +2,14 @@ import {
     actionInit,
     actionLocales
 } from '../redux'
+import {
+    type
+} from '../index'
 
 export default ({
     reduxStore
 }) => {
     reduxStore.dispatch(actionInit(reduxStore.getState()))
-    // reduxStore.dispatch(actionLocales())
+    if (type === 'redux')
+        reduxStore.dispatch(actionLocales())
 }

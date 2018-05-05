@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 
 export const I18N_INIT = 'I18N_INIT'
 export const I18N_LOCALES = 'I18N_LOCALES'
@@ -23,6 +23,12 @@ export const setLocaleId = newLlocalId => {
 export let locales = {}
 export const setLocales = (locale = localeId, obj) => {
     locales[locale] = obj
+}
+
+// i18n 类型
+export let type = 'default'
+export const setType = (_type) => {
+    if (_type) type = _type
 }
 
 
