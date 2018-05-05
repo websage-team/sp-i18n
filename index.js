@@ -25,12 +25,6 @@ export const setLocales = (locale = localeId, obj) => {
     locales[locale] = obj
 }
 
-// i18n 类型
-export let type = 'default'
-export const setType = (_type) => {
-    if (_type) type = _type
-}
-
 
 
 
@@ -61,7 +55,9 @@ const translate = (...args) => {
     let str
     let options = {}
     const keys = []
-    const l = type === 'redux' || __SERVER__ ? locales[localeId] : undefined
+    const l = JSON.parse(process.env.SUPER_I18N_TYPE) === 'redux' || __SERVER__
+        ? locales[localeId]
+        : undefined
 
     args.forEach((value, index) => {
         if (index == args.length - 1 && typeof value === 'object') {

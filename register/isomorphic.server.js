@@ -2,7 +2,6 @@ import {
     availableLocales,
     setAvailableLocales,
     setLocales,
-    setType,
 } from '../index'
 
 /**
@@ -14,12 +13,10 @@ import {
 export default ({
     localeIds,
     locales,
-    type,
 }) => {
     if (!__SERVER__) return
     if (availableLocales.length) return
 
-    setType(type)
     setAvailableLocales(localeIds)
     for (let key in locales) setLocales(key, locales[key])
 }
